@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KarierKita - Temukan Magang & Karier Impianmu</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS (Framework) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff', 100: '#ede9fe', 300: '#c4b5fd', 400: '#a78bfa',
+                            500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9', 800: '#5b21b6', 900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Memanggil file CSS Eksternal -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body class="text-slate-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center cursor-pointer group" onclick="navigate('home')">
+                    <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center mr-3 group-hover:bg-brand-700 transition">
+                        <i class="ph-fill ph-briefcase text-2xl text-white"></i>
+                    </div>
+                    <span class="font-extrabold text-xl tracking-tight text-slate-800">KarierKita</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <button id="nav-btn-home" onclick="navigate('home')" class="nav-link px-4 py-2 rounded-lg text-slate-600 hover:text-brand-600 hover:bg-brand-50 font-medium transition">Beranda</button>
+                    <button id="nav-btn-explore" onclick="navigate('explore')" class="nav-link px-4 py-2 rounded-lg text-slate-600 hover:text-brand-600 hover:bg-brand-50 font-medium transition">Jelajahi Lowongan</button>
+                    <button id="nav-btn-applications" onclick="navigate('applications')" class="nav-link px-4 py-2 rounded-lg text-slate-600 hover:text-brand-600 hover:bg-brand-50 font-medium transition">Lamaran Saya</button>
+                    
+                    <div class="h-6 w-px bg-slate-200 mx-2"></div> <!-- Divider -->
+                    
+                    <button onclick="navigate('profile')" class="flex items-center space-x-3 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition ml-2">
+                        <div class="relative">
+                            <img id="nav-user-avatar" src="image_d2d8c7.jpg" alt="User" class="w-9 h-9 rounded-full object-cover object-top border border-slate-200 shadow-sm">
+                            <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
+                        </div>
+                        <span class="font-bold text-sm text-slate-700" id="nav-user-name">Memuat...</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-brand-600 p-2 rounded-lg bg-slate-50 focus:outline-none">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 shadow-lg absolute w-full">
+            <div class="px-4 py-3 space-y-1">
+                <button onclick="navigate('home')" class="block w-full text-left px-4 py-3 text-slate-700 hover:bg-brand-50 hover:text-brand-700 rounded-lg font-medium transition">Beranda</button>
+                <button onclick="navigate('explore')" class="block w-full text-left px-4 py-3 text-slate-700 hover:bg-brand-50 hover:text-brand-700 rounded-lg font-medium transition">Jelajahi Lowongan</button>
+                <button onclick="navigate('applications')" class="block w-full text-left px-4 py-3 text-slate-700 hover:bg-brand-50 hover:text-brand-700 rounded-lg font-medium transition">Lamaran Saya</button>
+                <div class="h-px bg-slate-100 my-2"></div>
+                <button onclick="navigate('profile')" class="flex items-center space-x-3 w-full px-4 py-3 hover:bg-slate-50 rounded-lg transition">
+                    <img id="nav-mobile-avatar" src="image_d2d8c7.jpg" alt="User" class="w-8 h-8 rounded-full object-cover object-top">
+                    <span class="font-bold text-slate-700" id="nav-mobile-name">Memuat...</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="min-h-screen pb-20">
+
+        <!-- VIEW: HOME -->
+        <section id="view-home" class="view-section active">
+            <!-- Hero Section dengan Glassmorphism -->
+            <div class="relative bg-slate-900 overflow-hidden pb-24 pt-28 px-4">
+                <div class="absolute inset-0">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" class="w-full h-full object-cover opacity-30" alt="Office Background">
+                    <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-brand-900/90 to-slate-900 mix-blend-multiply"></div>
+                </div>
+                
+                <div class="relative max-w-4xl mx-auto text-center z-10">
+                    <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/10 border border-white/20 text-brand-100 text-sm font-semibold tracking-wide mb-6 backdrop-blur-md shadow-lg">
+                        <i class="ph-fill ph-rocket-launch text-brand-300"></i> Platform Karir #1 Mahasiswa
+                    </span>
+                    <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight text-white tracking-tight">
+                        Mulai Langkah Kariermu<br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-blue-300">Bersama KarierKita</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-light">
+                        Platform terpercaya untuk mahasiswa dan fresh graduate menemukan peluang magang dan pekerjaan terbaik di berbagai industri.
+                    </p>
+                    
+                    <!-- Search Bar Glassmorphism -->
+                    <form onsubmit="handleHeroSearch(event)" class="max-w-3xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-2 flex flex-col md:flex-row shadow-2xl gap-2">
+                        <div class="flex-grow flex items-center px-4 py-3 md:py-0">
+                            <i class="ph ph-magnifying-glass text-white/70 text-2xl mr-3"></i>
+                            <input type="text" id="hero-search-input" placeholder="Cari posisi pekerjaan atau nama perusahaan..." class="w-full bg-transparent border-none focus:outline-none text-white placeholder-white/70 text-lg">
+                        </div>
+                        <button type="submit" class="bg-brand-500 hover:bg-brand-400 text-white font-bold py-3.5 px-8 rounded-xl transition duration-300 ease-in-out shadow-lg whitespace-nowrap">
+                            Cari Lowongan
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 flex items-center gap-5 hover:-translate-y-1 transition">
+                        <div class="w-14 h-14 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600"><i class="ph-fill ph-buildings text-3xl"></i></div>
+                        <div><h3 class="font-bold text-2xl text-slate-800">500+</h3><p class="text-slate-500 font-medium text-sm">Perusahaan Mitra</p></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 flex items-center gap-5 hover:-translate-y-1 transition">
+                        <div class="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600"><i class="ph-fill ph-briefcase text-3xl"></i></div>
+                        <div><h3 class="font-bold text-2xl text-slate-800">2,000+</h3><p class="text-slate-500 font-medium text-sm">Lowongan Aktif</p></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 flex items-center gap-5 hover:-translate-y-1 transition">
+                        <div class="w-14 h-14 rounded-xl bg-green-50 flex items-center justify-center text-green-600"><i class="ph-fill ph-users text-3xl"></i></div>
+                        <div><h3 class="font-bold text-2xl text-slate-800">10k+</h3><p class="text-slate-500 font-medium text-sm">Kandidat Diterima</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Jobs Preview -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-800 tracking-tight">Lowongan Populer</h2>
+                        <p class="text-slate-500 mt-2 font-medium">Peluang karir terbaik yang paling banyak diminati saat ini.</p>
+                    </div>
+                    <button onclick="navigate('explore')" class="text-brand-600 font-bold hover:text-brand-700 flex items-center gap-2 transition bg-brand-50 px-5 py-2.5 rounded-lg hidden sm:flex">
+                        Lihat Semua <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </div>
+                <div id="featured-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Featured jobs injected by JS -->
+                </div>
+                <button onclick="navigate('explore')" class="w-full mt-6 text-brand-600 font-bold hover:text-brand-700 flex items-center justify-center gap-2 transition bg-brand-50 px-5 py-3 rounded-xl sm:hidden">
+                    Lihat Semua Lowongan <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW: EXPLORE JOBS -->
+        <section id="view-explore" class="view-section">
+            <div class="bg-white border-b border-slate-200 py-8 shadow-sm">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-3xl font-extrabold text-slate-800 mb-6">Jelajahi Lowongan</h2>
+                    
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-grow relative">
+                            <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-xl"></i>
+                            <input type="text" id="explore-search-input" placeholder="Cari posisi, perusahaan, atau kata kunci..." class="w-full pl-12 pr-4 py-3.5 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-0 focus:border-brand-500 font-medium transition text-slate-700">
+                        </div>
+                        <button onclick="filterJobs()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 px-8 rounded-xl transition duration-300 whitespace-nowrap shadow-md">
+                            Terapkan Filter
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 mt-6" id="category-filters">
+                        <!-- Categories injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+                <div class="flex justify-between items-center mb-6">
+                    <p class="text-slate-600 font-medium">Menampilkan <span id="job-count" class="font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">0</span> lowongan sesuai kriteria Anda</p>
+                </div>
+                
+                <div id="explore-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Jobs injected by JS -->
+                </div>
+                
+                <div id="no-jobs-message" class="hidden text-center py-20 bg-white rounded-2xl border border-slate-200 border-dashed">
+                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="ph ph-magnifying-glass text-4xl text-slate-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800">Tidak ada lowongan ditemukan</h3>
+                    <p class="text-slate-500 mt-2">Coba sesuaikan kata kunci atau pilih kategori lain.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: JOB DETAIL -->
+        <section id="view-job-detail" class="view-section">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+                <button onclick="navigate('explore')" class="text-slate-500 hover:text-brand-600 font-bold mb-6 flex items-center gap-2 transition bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm w-fit">
+                    <i class="ph-bold ph-arrow-left"></i> Kembali
+                </button>
+                
+                <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden relative">
+                    <!-- Decorator Line -->
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-500 to-blue-500"></div>
+                    
+                    <div class="p-8 md:p-10 border-b border-slate-100">
+                        <div class="flex flex-col md:flex-row justify-between items-start gap-6">
+                            <div class="flex items-center gap-5">
+                                <div class="w-20 h-20 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-inner">
+                                    <i class="ph-fill ph-buildings text-4xl text-brand-600"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-3 mb-1">
+                                        <h1 id="detail-title" class="text-3xl font-extrabold text-slate-800 tracking-tight">Posisi</h1>
+                                        <span id="detail-badge-applied" class="hidden px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200 flex items-center gap-1">
+                                            <i class="ph-fill ph-check-circle"></i> Sudah Dilamar
+                                        </span>
+                                    </div>
+                                    <p id="detail-company" class="text-xl text-brand-600 font-bold">Perusahaan</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 w-full md:w-auto">
+                                <button id="btn-save-job" onclick="toggleSaveDetailJob()" class="p-3.5 border-2 border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 hover:border-red-200 transition flex-shrink-0 group">
+                                    <i id="detail-save-icon" class="ph ph-heart text-2xl group-hover:text-red-500 transition"></i>
+                                </button>
+                                <button id="btn-apply-job" onclick="openApplyModal()" class="flex-grow md:flex-grow-0 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-8 rounded-xl transition shadow-lg hover:shadow-brand-500/30">
+                                    Lamar Pekerjaan Ini
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Section (Pelamar) -->
+                    <div class="px-8 py-5 bg-brand-50 border-b border-brand-100 flex items-center gap-4">
+                        <div class="flex -space-x-3">
+                            <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" src="https://i.pravatar.cc/100?img=68" alt="avatar">
+                            <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" src="https://i.pravatar.cc/100?img=33" alt="avatar">
+                            <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" src="https://i.pravatar.cc/100?img=47" alt="avatar">
+                            <div class="w-10 h-10 rounded-full border-2 border-white bg-white flex items-center justify-center text-xs font-bold text-brand-600 shadow-sm">+</div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-brand-900"><span id="detail-applicants" class="text-lg">0</span> orang telah melamar</p>
+                            <p class="text-xs text-brand-600 font-medium">Jadilah salah satu dari mereka!</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 p-8 md:p-10 bg-white border-b border-slate-100">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <i class="ph-fill ph-map-pin text-brand-500 text-2xl mb-2"></i>
+                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Lokasi</p>
+                            <p id="detail-location" class="font-bold text-slate-800">Jakarta</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <i class="ph-fill ph-briefcase text-brand-500 text-2xl mb-2"></i>
+                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Tipe</p>
+                            <p id="detail-type" class="font-bold text-slate-800">Magang</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <i class="ph-fill ph-folder text-brand-500 text-2xl mb-2"></i>
+                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Kategori</p>
+                            <p id="detail-category" class="font-bold text-slate-800">Teknologi</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <i class="ph-fill ph-currency-circle-dollar text-brand-500 text-2xl mb-2"></i>
+                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Gaji Estimasi</p>
+                            <p id="detail-salary" class="font-bold text-slate-800">Dirahasiakan</p>
+                        </div>
+                    </div>
+                    
+                    <div class="p-8 md:p-10">
+                        <h3 class="text-xl font-extrabold text-slate-800 mb-4 flex items-center gap-2"><i class="ph-fill ph-file-text text-brand-500"></i> Deskripsi Pekerjaan</h3>
+                        <p id="detail-description" class="text-slate-600 leading-relaxed mb-10 whitespace-pre-line text-lg">Deskripsi panjang...</p>
+                        
+                        <h3 class="text-xl font-extrabold text-slate-800 mb-4 flex items-center gap-2"><i class="ph-fill ph-check-square-offset text-brand-500"></i> Persyaratan</h3>
+                        <ul id="detail-requirements" class="space-y-3 mb-8">
+                            <!-- Requirements injected by JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: APPLICATIONS DASHBOARD -->
+        <section id="view-applications" class="view-section">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Dashboard Lamaran Saya</h2>
+                        <p class="text-slate-500 mt-2 font-medium">Pantau status lamaran dan pekerjaan yang Anda simpan di sini.</p>
+                    </div>
+                    
+                    <div class="flex bg-slate-100 rounded-xl p-1.5 border border-slate-200 shadow-inner w-full md:w-auto">
+                        <button onclick="switchDashboardTab('applied')" id="tab-applied" class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition bg-white text-brand-700 shadow-sm border border-slate-200">Riwayat Lamaran</button>
+                        <button onclick="switchDashboardTab('saved')" id="tab-saved" class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition text-slate-500 hover:text-slate-700">Tersimpan</button>
+                    </div>
+                </div>
+                
+                <div id="tab-content-applied" class="block">
+                    <div id="applications-container" class="grid gap-5">
+                        <!-- Applications injected by JS -->
+                    </div>
+                    <div id="no-applications-message" class="hidden bg-white rounded-2xl border border-slate-200 border-dashed p-16 text-center">
+                        <div class="w-24 h-24 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="ph-fill ph-paper-plane-tilt text-5xl text-brand-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800">Belum ada lamaran terkirim</h3>
+                        <p class="text-slate-500 mt-2 mb-8 text-lg">Mulai langkah karir Anda dengan melamar pekerjaan pertama Anda.</p>
+                        <button onclick="navigate('explore')" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg">Cari Lowongan Sekarang</button>
+                    </div>
+                </div>
+
+                <div id="tab-content-saved" class="hidden">
+                    <div id="saved-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Saved jobs injected by JS -->
+                    </div>
+                    <div id="no-saved-message" class="hidden bg-white rounded-2xl border border-slate-200 border-dashed p-16 text-center">
+                        <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="ph-fill ph-heart text-5xl text-red-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800">Belum ada lowongan tersimpan</h3>
+                        <p class="text-slate-500 mt-2 text-lg">Klik ikon hati pada lowongan menarik untuk menyimpannya di sini.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: PROFILE (PRO & MODERN LAYOUT) -->
+        <section id="view-profile" class="view-section">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-20">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Pengaturan Profil</h2>
+                        <p class="text-slate-500 mt-1 font-medium">Kelola identitas profesional dan informasi akun Anda untuk melamar pekerjaan.</p>
+                    </div>
+                    <button type="button" onclick="toggleEditProfile()" class="px-5 py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold rounded-xl text-sm transition flex items-center gap-2 border border-brand-200 shadow-sm">
+                        <i class="ph-bold ph-pencil-simple text-base"></i> <span id="edit-btn-text">Edit Profil</span>
+                    </button>
+                </div>
+                
+                <!-- Layout Grid Profesional (2 Kolom) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Kolom Kiri: Kartu Ringkasan Profil -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden text-center p-6 relative">
+                            <!-- Banner Kecil di atas -->
+                            <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-brand-800 to-blue-600"></div>
+                            
+                            <!-- Avatar -->
+                            <div class="relative mt-8 inline-block">
+                                <div class="w-32 h-32 rounded-full bg-white border-4 border-white shadow-xl overflow-hidden mx-auto ring-4 ring-brand-50">
+                                    <img id="profile-user-avatar" src="image_d2d8c7.jpg" alt="User" class="w-full h-full object-cover object-top">
+                                </div>
+                                <div class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full" title="Aktif"></div>
+                            </div>
+                            
+                            <h3 id="profile-display-name" class="text-xl font-extrabold text-slate-800 mt-4">Memuat...</h3>
+                            <p id="profile-display-email" class="text-sm text-brand-600 font-bold mt-0.5">Memuat...</p>
+                            
+                            <div class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
+                                <i class="ph-fill ph-student text-brand-500"></i> Kandidat Mahasiswa
+                            </div>
+
+                            <div class="mt-6 pt-6 border-t border-slate-100 text-left space-y-3">
+                                <div class="flex items-center gap-3 text-sm text-slate-600">
+                                    <div class="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center text-brand-600 flex-shrink-0">
+                                        <i class="ph-fill ph-buildings text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-slate-400 font-medium">Institusi</p>
+                                        <p id="summary-uni" class="font-bold text-slate-700">-</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm text-slate-600">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
+                                        <i class="ph-fill ph-certificate text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-slate-400 font-medium">Program Studi</p>
+                                        <p id="summary-major" class="font-bold text-slate-700">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Kanan: Form Detail Profil -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+                            <h4 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <i class="ph-fill ph-user-circle text-brand-600 text-2xl"></i> Informasi Personal
+                            </h4>
+
+                            <form id="profile-form" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">Nama Lengkap</label>
+                                        <input type="text" id="prof-name" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-brand-500 font-medium transition text-slate-800 bg-slate-50" disabled>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">Alamat Email</label>
+                                        <input type="email" id="prof-email" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-brand-500 font-medium transition text-slate-800 bg-slate-50" disabled>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">Universitas / Institusi</label>
+                                        <input type="text" id="prof-uni" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-brand-500 font-medium transition text-slate-800 bg-slate-50" disabled>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">Program Studi</label>
+                                        <input type="text" id="prof-major" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-brand-500 font-medium transition text-slate-800 bg-slate-50" disabled>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi Singkat (Bio Profesional)</label>
+                                    <textarea id="prof-bio" rows="4" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-brand-500 font-medium transition text-slate-800 bg-slate-50" disabled></textarea>
+                                </div>
+                                
+                                <div id="profile-actions" class="hidden flex justify-end gap-3 pt-6 border-t border-slate-100">
+                                    <button type="button" onclick="toggleEditProfile()" class="px-6 py-3 border-2 border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-bold transition">Batal</button>
+                                    <button type="submit" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold transition shadow-lg">Simpan Perubahan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Application Modal -->
+    <div id="apply-modal" class="modal fixed inset-0 z-[100] items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300" id="apply-modal-content">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-xl font-extrabold text-slate-800">Kirim Lamaran</h3>
+                <button onclick="closeApplyModal()" class="text-slate-400 hover:text-red-500 transition bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="apply-form" class="p-6">
+                <div class="mb-6 bg-brand-50 border border-brand-100 p-4 rounded-xl flex items-start gap-3">
+                    <i class="ph-fill ph-info text-brand-600 text-2xl mt-0.5"></i>
+                    <div>
+                        <p class="text-sm text-brand-900 font-medium">Posisi yang dilamar:</p>
+                        <p class="text-base text-brand-700"><strong id="modal-job-title" class="font-extrabold text-brand-800"></strong> di <strong id="modal-job-company"></strong></p>
+                    </div>
+                </div>
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <input type="text" id="apply-name" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-brand-500 font-medium transition text-slate-800 bg-slate-50" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1.5">Alamat Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="apply-email" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-brand-500 font-medium transition text-slate-800 bg-slate-50" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1.5">Tautan CV / Portofolio (Gdrive/Linkedin) <span class="text-red-500">*</span></label>
+                        <input type="url" id="apply-cv" required class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-0 focus:border-brand-500 font-medium transition text-slate-800" placeholder="https://...">
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-100">
+                    <button type="button" onclick="closeApplyModal()" class="px-6 py-3 border-2 border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-bold transition">Batal</button>
+                    <button type="submit" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold transition shadow-lg flex items-center gap-2">
+                        Kirim Sekarang <i class="ph-bold ph-paper-plane-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-10 text-center border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center mr-2">
+                    <i class="ph-fill ph-briefcase text-lg text-white"></i>
+                </div>
+                <span class="font-extrabold text-xl text-white tracking-tight">KarierKita</span>
+            </div>
+            <p class="font-medium text-sm">&copy; 2026 KarierKita. Proyek Sistem Informasi Magang dan Karier.</p>
+            <p class="text-xs mt-2 text-slate-600">Disusun oleh Muhammad Yosi</p>
+        </div>
+    </footer>
+
+    <!-- Memanggil file JS Eksternal -->
+    <script src="script.js"></script>
+
+</body>
+</html>
