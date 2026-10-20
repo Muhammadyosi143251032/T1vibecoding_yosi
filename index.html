@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KarierKita - Temukan Magang & Karier Impianmu</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Smooth View Transitions */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background-color: #334155;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        /* Modal Utilities */
+        .modal {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="navigate('home')">
+                    <i class="ph-fill ph-briefcase text-3xl text-brand-600 mr-2"></i>
+                    <span class="font-bold text-xl tracking-tight text-brand-900">KarierKita</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="navigate('home')" class="nav-link text-slate-600 hover:text-brand-600 font-medium transition">Beranda</button>
+                    <button onclick="navigate('explore')" class="nav-link text-slate-600 hover:text-brand-600 font-medium transition">Jelajahi Lowongan</button>
+                    <button onclick="navigate('applications')" class="nav-link text-slate-600 hover:text-brand-600 font-medium transition">Lamaran Saya</button>
+                    <button onclick="navigate('profile')" class="flex items-center space-x-3 text-slate-600 hover:text-brand-600 transition pl-4 border-l border-slate-200">
+                        <div class="relative flex-shrink-0">
+                            <img id="nav-user-avatar" 
+                                 src="profile.jpg" 
+                                 alt="Muhammad Yosi" class="w-10 h-10 rounded-full object-cover object-top border-2 border-brand-500 shadow-md ring-2 ring-white bg-slate-100">
+                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                        </div>
+                        <span class="font-bold text-slate-800 text-sm sm:text-base whitespace-nowrap" id="nav-user-name">Muhammad Yosi</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-brand-600 focus:outline-none">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button onclick="navigate('home')" class="block w-full text-left px-3 py-2 text-slate-600 hover:bg-brand-50 hover:text-brand-600 rounded-md font-medium">Beranda</button>
+                <button onclick="navigate('explore')" class="block w-full text-left px-3 py-2 text-slate-600 hover:bg-brand-50 hover:text-brand-600 rounded-md font-medium">Jelajahi Lowongan</button>
+                <button onclick="navigate('applications')" class="block w-full text-left px-3 py-2 text-slate-600 hover:bg-brand-50 hover:text-brand-600 rounded-md font-medium">Lamaran Saya</button>
+                <button onclick="navigate('profile')" class="block w-full text-left px-3 py-2 text-slate-600 hover:bg-brand-50 hover:text-brand-600 rounded-md font-medium">Profil</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="min-h-screen pb-20">
+
+        <!-- VIEW: HOME -->
+        <section id="view-home" class="view-section active">
+            <!-- Hero Section -->
+            <div class="relative bg-slate-900 overflow-hidden pb-20 pt-24 px-4">
+                <div class="absolute inset-0">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" class="w-full h-full object-cover opacity-20" alt="Office Background">
+                    <div class="absolute inset-0 bg-gradient-to-r from-brand-900/90 to-indigo-900/90 mix-blend-multiply"></div>
+                </div>
+                
+                <div class="relative max-w-4xl mx-auto text-center z-10">
+                    <span class="inline-block py-1 px-3 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-200 text-sm font-semibold tracking-wide mb-4 backdrop-blur-sm">Platform Karir #1 Mahasiswa</span>
+                    <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight text-white tracking-tight">Mulai Langkah Kariermu<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-indigo-300">Bersama KarierKita</span></h1>
+                    <p class="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-light">Platform terpercaya untuk mahasiswa dan fresh graduate menemukan peluang magang dan pekerjaan terbaik di berbagai industri.</p>
+                    
+                    <form onsubmit="handleHeroSearch(event)" class="max-w-2xl mx-auto bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-2 flex shadow-2xl">
+                        <div class="flex-grow flex items-center px-4">
+                            <i class="ph ph-magnifying-glass text-white/70 text-xl mr-3"></i>
+                            <input type="text" id="hero-search-input" placeholder="Cari posisi atau nama perusahaan..." class="w-full bg-transparent border-none focus:outline-none text-white placeholder-white/60 text-lg">
+                        </div>
+                        <button type="submit" class="bg-brand-500 hover:bg-brand-400 text-white font-bold py-3 px-8 rounded-full transition duration-300 ease-in-out shadow-lg">
+                            Mulai Cari
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-brand-50 flex items-center justify-center text-brand-600"><i class="ph ph-buildings text-2xl"></i></div>
+                        <div><h3 class="font-bold text-2xl text-slate-800">500+</h3><p class="text-slate-500 text-sm">Perusahaan Mitra</p></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600"><i class="ph ph-briefcase text-2xl"></i></div>
+                        <div><h3 class="font-bold text-2xl text-slate-800">2,000+</h3><p class="text-slate-500 text-sm">Lowongan Aktif</p></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600"><i class="ph ph-users text-2xl"></i></div>
+                        <div><h3 class="font-bold text-2xl text-slate-800">10k+</h3><p class="text-slate-500 text-sm">Kandidat Diterima</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Jobs Preview -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Lowongan Terbaru</h2>
+                        <p class="text-slate-500 mt-1">Peluang karir terbaik yang baru saja ditambahkan.</p>
+                    </div>
+                    <button onclick="navigate('explore')" class="text-brand-600 font-medium hover:text-brand-700 flex items-center gap-1 transition">
+                        Lihat Semua <i class="ph ph-arrow-right"></i>
+                    </button>
+                </div>
+                <div id="featured-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: EXPLORE JOBS -->
+        <section id="view-explore" class="view-section">
+            <div class="bg-white border-b border-slate-200 py-8">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-6">Jelajahi Lowongan</h2>
+                    
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-grow relative">
+                            <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="explore-search-input" placeholder="Cari posisi, perusahaan, atau kata kunci..." class="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition">
+                        </div>
+                        <button onclick="filterJobs()" class="bg-slate-800 hover:bg-slate-900 text-white font-medium py-3 px-8 rounded-lg transition duration-300 whitespace-nowrap">
+                            Cari Lowongan
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mt-6" id="category-filters">
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+                <div class="flex justify-between items-center mb-6">
+                    <p class="text-slate-600">Menampilkan <span id="job-count" class="font-bold text-slate-800">0</span> lowongan</p>
+                </div>
+                
+                <div id="explore-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+                
+                <div id="no-jobs-message" class="hidden text-center py-16">
+                    <i class="ph ph-magnifying-glass text-6xl text-slate-300 mb-4"></i>
+                    <h3 class="text-xl font-medium text-slate-700">Tidak ada lowongan ditemukan</h3>
+                    <p class="text-slate-500 mt-2">Coba sesuaikan kata kunci atau filter pencarian Anda.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: JOB DETAIL -->
+        <section id="view-job-detail" class="view-section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+                <button onclick="navigate('explore')" class="text-slate-500 hover:text-brand-600 font-medium mb-6 flex items-center gap-2 transition">
+                    <i class="ph ph-arrow-left"></i> Kembali ke Pencarian
+                </button>
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                                <i class="ph ph-buildings text-3xl text-slate-500"></i>
+                            </div>
+                            <div>
+                                <h1 id="detail-title" class="text-2xl font-bold text-slate-800">Posisi</h1>
+                                <p id="detail-company" class="text-lg text-brand-600 font-medium">Perusahaan</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <button id="btn-save-job" onclick="toggleSaveDetailJob()" class="p-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-red-500 transition flex-shrink-0">
+                                <i id="detail-save-icon" class="ph ph-heart text-xl"></i>
+                            </button>
+                            <button onclick="openApplyModal()" class="flex-grow md:flex-grow-0 bg-brand-600 hover:bg-brand-700 text-white font-medium py-3 px-8 rounded-lg transition shadow-sm">
+                                Lamar Sekarang
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-8 bg-slate-50 border-b border-slate-100">
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1">Lokasi</p>
+                            <p id="detail-location" class="font-medium text-slate-800 flex items-center gap-1"><i class="ph ph-map-pin"></i> Jakarta</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1">Kategori</p>
+                            <p id="detail-category" class="font-medium text-slate-800">Teknologi</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1">Tipe Pekerjaan</p>
+                            <p id="detail-type" class="font-medium text-slate-800">Magang</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1">Gaji (Estimasi)</p>
+                            <p id="detail-salary" class="font-medium text-slate-800">Dirahasiakan</p>
+                        </div>
+                    </div>
+                    
+                    <div class="px-8 py-4 bg-brand-50 border-b border-brand-100 flex items-center gap-4">
+                        <div class="flex -space-x-2">
+                            <img class="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=68" alt="avatar">
+                            <img class="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=33" alt="avatar">
+                            <img class="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=47" alt="avatar">
+                            <div class="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">+</div>
+                        </div>
+                        <p class="text-sm font-medium text-brand-800"><span id="detail-applicants" class="font-bold">0</span> orang telah melamar posisi ini.</p>
+                    </div>
+
+                    <div class="p-8">
+                        <h3 class="text-lg font-bold text-slate-800 mb-4">Deskripsi Pekerjaan</h3>
+                        <p id="detail-description" class="text-slate-600 leading-relaxed mb-8 whitespace-pre-line">Deskripsi panjang...</p>
+                        
+                        <h3 class="text-lg font-bold text-slate-800 mb-4">Persyaratan</h3>
+                        <ul id="detail-requirements" class="list-disc list-inside text-slate-600 space-y-2 mb-8">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: APPLICATIONS DASHBOARD -->
+        <section id="view-applications" class="view-section">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-800">Dashboard Lamaran</h2>
+                        <p class="text-slate-500 mt-1">Pantau status lamaran pekerjaan dan magang Anda.</p>
+                    </div>
+                    
+                    <div class="flex bg-white rounded-lg p-1 border border-slate-200 shadow-sm w-full md:w-auto">
+                        <button onclick="switchDashboardTab('applied')" id="tab-applied" class="flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-medium transition bg-brand-50 text-brand-700">Riwayat Lamaran</button>
+                        <button onclick="switchDashboardTab('saved')" id="tab-saved" class="flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-medium transition text-slate-600 hover:bg-slate-50">Tersimpan</button>
+                    </div>
+                </div>
+                
+                <div id="tab-content-applied" class="block">
+                    <div id="applications-container" class="grid gap-4">
+                    </div>
+                    <div id="no-applications-message" class="hidden bg-white rounded-xl border border-slate-200 p-12 text-center">
+                        <i class="ph ph-files text-6xl text-slate-300 mb-4"></i>
+                        <h3 class="text-xl font-medium text-slate-700">Belum ada lamaran</h3>
+                        <p class="text-slate-500 mt-2 mb-6">Anda belum mengirimkan lamaran pekerjaan apapun.</p>
+                        <button onclick="navigate('explore')" class="bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-6 rounded-lg transition">Mulai Cari Lowongan</button>
+                    </div>
+                </div>
+
+                <div id="tab-content-saved" class="hidden">
+                    <div id="saved-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+                    <div id="no-saved-message" class="hidden bg-white rounded-xl border border-slate-200 p-12 text-center">
+                        <i class="ph ph-heart text-6xl text-slate-300 mb-4"></i>
+                        <h3 class="text-xl font-medium text-slate-700">Tidak ada lowongan tersimpan</h3>
+                        <p class="text-slate-500 mt-2">Simpan lowongan menarik untuk melamarnya nanti.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: PROFILE -->
+        <section id="view-profile" class="view-section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 tracking-tight">Profil Kandidat</h2>
+                        <p class="text-slate-500 text-sm mt-1">Kelola informasi pribadi dan data akun Anda.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <!-- Banner Visual -->
+                    <div class="bg-gradient-to-r from-brand-900 via-brand-700 to-indigo-900 h-36 sm:h-44 relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.8) 1px, transparent 0); background-size: 24px 24px;"></div>
+                        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-brand-500/30 rounded-full blur-2xl"></div>
+                    </div>
+
+                    <!-- Profile Header Content -->
+                    <div class="px-6 sm:px-8 pb-8">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 -mt-14 sm:-mt-16 mb-6">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-end gap-4 sm:gap-6 w-full sm:w-auto">
+                                <div class="relative flex-shrink-0">
+                                    <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-white p-1 shadow-lg ring-4 ring-brand-100 overflow-hidden">
+                                        <img id="profile-user-avatar" 
+                                             src="profile.jpg" 
+                                             alt="Muhammad Yosi" class="w-full h-full rounded-full object-cover object-top bg-slate-100">
+                                    </div>
+                                    <span class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 border-2 border-white rounded-full" title="Status: Aktif"></span>
+                                </div>
+                                <div class="pt-2 sm:pt-0 sm:pb-2">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h3 id="profile-display-name" class="text-2xl sm:text-3xl font-bold text-slate-800 tracking-tight">Muhammad Yosi</h3>
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">Siap Magang</span>
+                                    </div>
+                                    <p id="profile-display-email" class="text-slate-500 text-sm font-medium flex items-center gap-1.5 mt-1">
+                                        <i class="ph ph-envelope text-slate-400"></i> muhammad.yosi@email.com
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="toggleEditProfile()" class="w-full sm:w-auto px-5 py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200/80 font-semibold rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+                                <i class="ph ph-pencil-simple text-lg"></i> <span>Edit Profil</span>
+                            </button>
+                        </div>
+
+                        <!-- Stats & Info Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 mb-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-brand-100/80 text-brand-700 flex items-center justify-center flex-shrink-0">
+                                    <i class="ph ph-graduation-cap text-xl"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="text-xs text-slate-400 font-medium">Universitas</p>
+                                    <p id="profile-card-uni" class="text-sm font-semibold text-slate-700 truncate">Politeknik Negeri Jember</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-indigo-100/80 text-indigo-700 flex items-center justify-center flex-shrink-0">
+                                    <i class="ph ph-book-open text-xl"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="text-xs text-slate-400 font-medium">Program Studi</p>
+                                    <p id="profile-card-major" class="text-sm font-semibold text-slate-700 truncate">Sistem Informasi</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-100/80 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                                    <i class="ph ph-briefcase text-xl"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="text-xs text-slate-400 font-medium">Aktivitas</p>
+                                    <p class="text-sm font-semibold text-slate-700">2 Lamaran Aktif</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Detail Profil -->
+                        <form id="profile-form" class="space-y-6">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <h4 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                                    <i class="ph ph-user-circle text-brand-600 text-xl"></i> Informasi Biodata
+                                </h4>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Nama Lengkap</label>
+                                    <div class="relative">
+                                        <i class="ph ph-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="text" id="prof-name" class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition disabled:bg-slate-50 disabled:text-slate-600" disabled>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+                                    <div class="relative">
+                                        <i class="ph ph-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="email" id="prof-email" class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition disabled:bg-slate-50 disabled:text-slate-600" disabled>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Universitas / Institusi</label>
+                                    <div class="relative">
+                                        <i class="ph ph-buildings absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="text" id="prof-uni" class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition disabled:bg-slate-50 disabled:text-slate-600" disabled>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Program Studi</label>
+                                    <div class="relative">
+                                        <i class="ph ph-student absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="text" id="prof-major" class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition disabled:bg-slate-50 disabled:text-slate-600" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Deskripsi Singkat (Bio)</label>
+                                <textarea id="prof-bio" rows="3" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition disabled:bg-slate-50 disabled:text-slate-600" disabled></textarea>
+                            </div>
+                            
+                            <div id="profile-actions" class="hidden flex justify-end gap-3 pt-4 border-t border-slate-100">
+                                <button type="button" onclick="toggleEditProfile()" class="px-6 py-2.5 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium transition">Batal</button>
+                                <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium transition shadow-sm">Simpan Profil</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Application Modal -->
+    <div id="apply-modal" class="modal fixed inset-0 z-[100] items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300" id="apply-modal-content">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-slate-800">Kirim Lamaran</h3>
+                <button onclick="closeApplyModal()" class="text-slate-400 hover:text-slate-600 transition">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+            </div>
+            
+            <form id="apply-form" class="p-6">
+                <div class="mb-4 bg-brand-50 p-4 rounded-lg flex items-center gap-3">
+                    <i class="ph-fill ph-info text-brand-600 text-xl"></i>
+                    <p class="text-sm text-brand-800">Anda melamar untuk posisi <strong id="modal-job-title"></strong> di <strong id="modal-job-company"></strong>.</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <input type="text" id="apply-name" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" placeholder="Masukkan nama lengkap">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Alamat Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="apply-email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" placeholder="contoh@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Tautan CV / Portofolio <span class="text-red-500">*</span></label>
+                        <input type="url" id="apply-cv" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" placeholder="https://drive.google.com/... atau Linkedin">
+                        <p class="text-xs text-slate-500 mt-1">Pastikan tautan dapat diakses publik.</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex justify-end gap-3">
+                    <button type="button" onclick="closeApplyModal()" class="px-6 py-2.5 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium transition">Batal</button>
+                    <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium transition shadow-sm flex items-center gap-2">
+                        Kirim Lamaran <i class="ph ph-paper-plane-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-center mb-4">
+                <i class="ph-fill ph-briefcase text-2xl text-brand-500 mr-2"></i>
+                <span class="font-bold text-xl text-white">KarierKita</span>
+            </div>
+            <p>&copy; 2026 KarierKita. Proyek Simulasi Sistem Informasi Magang dan Karier.</p>
+        </div>
+    </footer>
+
+    <script>
+        /* ---------------------------------------------------------
+           1. DATA SIMULASI (MOCK DATA)
+           --------------------------------------------------------- */
+        const categories = ["Semua", "Teknologi", "Bisnis Digital", "Pemasaran", "Desain", "Administrasi"];
+        
+        const jobs = [
+            {
+                id: 1,
+                title: "Frontend Developer Intern",
+                company: "Tokopedia",
+                location: "Jakarta, Indonesia (Hybrid)",
+                type: "Magang",
+                category: "Teknologi",
+                salary: "Rp 3.000.000 - Rp 4.500.000",
+                applicants: 124,
+                description: "Bergabung dengan tim Engineering Tokopedia untuk membangun antarmuka web yang responsif dan cepat. Anda akan dimentori oleh Senior Engineers dan terlibat langsung dalam proyek berskala besar.",
+                requirements: [
+                    "Mahasiswa tingkat akhir atau fresh graduate jurusan Ilmu Komputer/IT.",
+                    "Memahami dasar-dasar HTML, CSS, dan JavaScript.",
+                    "Familiar dengan framework modern seperti React atau Vue adalah nilai tambah.",
+                    "Memiliki kemampuan problem solving yang baik dan kemauan belajar tinggi."
+                ]
+            },
+            {
+                id: 2,
+                title: "Digital Marketing Specialist",
+                company: "Shopee",
+                location: "Jakarta, Indonesia (On-site)",
+                type: "Purna Waktu",
+                category: "Pemasaran",
+                salary: "Rp 6.000.000 - Rp 9.000.000",
+                applicants: 312,
+                description: "Mengelola, mengeksekusi, dan mengoptimalkan kampanye pemasaran digital untuk meningkatkan akuisisi dan retensi pengguna. Berkolaborasi dengan tim kreatif untuk materi kampanye.",
+                requirements: [
+                    "Minimal S1 dari semua jurusan (Pemasaran/Komunikasi diutamakan).",
+                    "Pengalaman minimal 1 tahun di bidang Digital Marketing (Fresh graduate dipersilakan melamar).",
+                    "Memahami SEO, SEM, dan analisis media sosial.",
+                    "Terbiasa dengan data dan tools analitik (Google Analytics, dll)."
+                ]
+            },
+            {
+                id: 3,
+                title: "UI/UX Designer",
+                company: "Gojek",
+                location: "Bandung, Indonesia (Remote)",
+                type: "Purna Waktu",
+                category: "Desain",
+                salary: "Rp 7.000.000 - Rp 12.000.000",
+                applicants: 89,
+                description: "Merancang pengalaman pengguna (UX) dan antarmuka (UI) yang intuitif untuk aplikasi internal maupun eksternal Gojek. Anda akan bekerja erat dengan Product Manager dan Engineer.",
+                requirements: [
+                    "Memiliki portofolio desain UI/UX yang kuat.",
+                    "Mahir menggunakan Figma, Sketch, atau alat desain serupa.",
+                    "Memahami prinsip-prinsip User-Centered Design (UCD).",
+                    "Kemampuan komunikasi yang baik untuk mempresentasikan desain."
+                ]
+            },
+            {
+                id: 4,
+                title: "Business Analyst Intern",
+                company: "Traveloka",
+                location: "Tangerang Selatan (Hybrid)",
+                type: "Magang",
+                category: "Bisnis Digital",
+                salary: "Rp 3.500.000 - Rp 5.000.000",
+                applicants: 205,
+                description: "Membantu tim strategi bisnis dalam mengumpulkan data pasar, menganalisis tren, dan menyusun laporan untuk mendukung pengambilan keputusan strategis perusahaan.",
+                requirements: [
+                    "Mahasiswa S1 jurusan Manajemen, Ekonomi, atau Teknik Industri.",
+                    "Kemampuan analisis data yang kuat menggunakan Excel/Google Sheets.",
+                    "Pengetahuan dasar SQL menjadi nilai plus.",
+                    "Teliti, proaktif, dan dapat bekerja dalam tim."
+                ]
+            },
+            {
+                id: 5,
+                title: "HR Administrator",
+                company: "Astra International",
+                location: "Jakarta, Indonesia (On-site)",
+                type: "Kontrak",
+                category: "Administrasi",
+                salary: "Rp 5.500.000 - Rp 7.000.000",
+                applicants: 156,
+                description: "Mengelola dokumen administrasi kepegawaian, membantu proses rekrutmen, penjadwalan wawancara, dan mengelola database karyawan secara akurat.",
+                requirements: [
+                    "S1 Psikologi, Manajemen SDM, atau Administrasi Bisnis.",
+                    "Memiliki keterampilan organisasi dan administrasi yang sangat baik.",
+                    "Mahir menggunakan Microsoft Office (Word, Excel).",
+                    "Memiliki komunikasi yang sopan dan profesional."
+                ]
+            },
+            {
+                id: 6,
+                title: "Backend Engineer",
+                company: "Bukalapak",
+                location: "Yogyakarta, Indonesia (Remote)",
+                type: "Purna Waktu",
+                category: "Teknologi",
+                salary: "Rp 8.000.000 - Rp 15.000.000",
+                applicants: 78,
+                description: "Mengembangkan API yang scalable dan aman, mengoptimalkan kinerja database, dan memastikan sistem backend dapat menangani traffic tinggi selama periode kampanye.",
+                requirements: [
+                    "Pengalaman 1-3 tahun dalam pengembangan backend (Go, Python, atau Node.js).",
+                    "Pemahaman kuat tentang struktur data, algoritma, dan arsitektur sistem.",
+                    "Pengalaman dengan database SQL dan NoSQL.",
+                    "Pemahaman tentang CI/CD dan cloud services (AWS/GCP)."
+                ]
+            },
+            {
+                id: 7,
+                title: "Graphic Design Intern",
+                company: "Ruangguru",
+                location: "Jakarta, Indonesia (Hybrid)",
+                type: "Magang",
+                category: "Desain",
+                salary: "Rp 2.500.000 - Rp 4.000.000",
+                applicants: 340,
+                description: "Membantu tim konten dalam membuat materi visual grafis untuk media sosial, blog, dan materi promosi edukasi Ruangguru.",
+                requirements: [
+                    "Mahasiswa aktif DKV atau jurusan terkait.",
+                    "Menguasai Adobe Illustrator, Photoshop, atau Canva.",
+                    "Kreatif dan mengikuti tren desain visual terkini.",
+                    "Harap lampirkan portofolio (wajib)."
+                ]
+            },
+            {
+                id: 8,
+                title: "SEO Specialist",
+                company: "Blibli",
+                location: "Jakarta, Indonesia (Hybrid)",
+                type: "Purna Waktu",
+                category: "Pemasaran",
+                salary: "Rp 6.500.000 - Rp 9.500.000",
+                applicants: 92,
+                description: "Bertanggung jawab untuk optimisasi on-page dan off-page guna meningkatkan peringkat organik situs Blibli di mesin pencari.",
+                requirements: [
+                    "Memahami cara kerja algoritma mesin pencari Google.",
+                    "Pengalaman menggunakan Ahrefs, SEMrush, dan Google Search Console.",
+                    "Mampu melakukan riset kata kunci dan analisis kompetitor.",
+                    "Pemahaman dasar HTML/CSS untuk technical SEO."
+                ]
+            }
+        ];
+
+        /* ---------------------------------------------------------
+           2. STATE & LOCAL STORAGE MANAGEMENT
+           --------------------------------------------------------- */
+        let currentView = 'home';
+        let activeCategory = 'Semua';
+        let searchQuery = '';
+        let currentJobId = null;
+
+        const getStorage = (key, defaultVal) => JSON.parse(localStorage.getItem(key)) || defaultVal;
+        const setStorage = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+
+        // Menggunakan key v10 untuk mengunci pembacaan file ke profile.jpg
+        let userFavorites = getStorage('karierkita_favorites_v10', [1, 3]);
+        let userApplications = getStorage('karierkita_applications_v10', [
+            {
+                id: 1700100000000,
+                jobId: 2,
+                name: 'Muhammad Yosi',
+                email: 'muhammad.yosi@email.com',
+                cvLink: 'https://linkedin.com/in/muhammadyosi',
+                status: 'Ditinjau',
+                date: '10 Oktober 2026'
+            },
+            {
+                id: 1700200000000,
+                jobId: 4,
+                name: 'Muhammad Yosi',
+                email: 'muhammad.yosi@email.com',
+                cvLink: 'https://linkedin.com/in/muhammadyosi',
+                status: 'Wawancara',
+                date: '15 Oktober 2026'
+            }
+        ]);
+        let userProfile = getStorage('karierkita_profile_v10', {
+            name: 'Muhammad Yosi',
+            email: 'muhammad.yosi@email.com',
+            university: 'Politeknik Negeri Jember',
+            major: 'Bisnis Digital',
+            bio: 'Mahasiswa tingkat akhir yang bersemangat untuk memulai karir di industri digital. Memiliki minat pada pengembangan produk, analitik data, dan desain antarmuka pengguna.',
+            avatar: 'profile.jpg'
+        });
+
+        // Mengunci nama file gambar ke profile.jpg secara konsisten
+        userProfile.avatar = 'profile.jpg';
+
+        function updateUserInfoUI() {
+            const nameNav = document.getElementById('nav-user-name');
+            if (nameNav) nameNav.textContent = userProfile.name;
+            
+            const nameProf = document.getElementById('profile-display-name');
+            if (nameProf) nameProf.textContent = userProfile.name;
+
+            const emailProf = document.getElementById('profile-display-email');
+            if (emailProf) emailProf.textContent = userProfile.email;
+
+            const uniProf = document.getElementById('profile-card-uni');
+            if (uniProf) uniProf.textContent = userProfile.university || 'Politeknik Negeri Jember';
+
+            const majorProf = document.getElementById('profile-card-major');
+            if (majorProf) majorProf.textContent = userProfile.major || 'Sistem Informasi';
+
+            const navAvatar = document.getElementById('nav-user-avatar');
+            if (navAvatar) {
+                navAvatar.src = 'profile.jpg';
+            }
+
+            const profAvatar = document.getElementById('profile-user-avatar');
+            if (profAvatar) {
+                profAvatar.src = 'profile.jpg';
+            }
+        }
+
+        /* ---------------------------------------------------------
+           3. UI CORE & NAVIGATION
+           --------------------------------------------------------- */
+        function navigate(viewName, params = {}) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${viewName}`).classList.add('active');
+            currentView = viewName;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (viewName === 'explore') {
+                renderCategoryFilters();
+                filterJobs();
+            } else if (viewName === 'job-detail') {
+                loadJobDetail(params.id);
+            } else if (viewName === 'applications') {
+                renderApplications();
+                renderFavorites();
+            } else if (viewName === 'profile') {
+                loadProfile();
+            }
+
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            const icon = type === 'success' ? '<i class="ph-fill ph-check-circle text-green-400 text-2xl"></i>' 
+                                            : '<i class="ph-fill ph-info text-blue-400 text-2xl"></i>';
+            
+            toast.innerHTML = `${icon} <span class="font-medium">${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        /* ---------------------------------------------------------
+           4. RENDER UTILITIES (CARDS)
+           --------------------------------------------------------- */
+        function createJobCard(job) {
+            const isFav = userFavorites.includes(job.id);
+            const favIconClass = isFav ? 'ph-fill ph-heart text-red-500' : 'ph ph-heart text-slate-400';
+            
+            return `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 p-6 flex flex-col h-full cursor-pointer group" onclick="navigate('job-detail', {id: ${job.id}})">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 group-hover:scale-110 group-hover:bg-brand-50 group-hover:text-brand-600 transition duration-300 shadow-sm">
+                            <i class="ph ph-buildings text-3xl"></i>
+                        </div>
+                        <button onclick="toggleFavorite(event, ${job.id})" class="p-2 -mr-2 -mt-2 rounded-full hover:bg-slate-50 transition">
+                            <i class="${favIconClass} text-2xl" id="fav-icon-${job.id}"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4 flex-grow">
+                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 mb-3 border border-brand-100">${job.category}</span>
+                        <h3 class="text-xl font-bold text-slate-800 mb-1 group-hover:text-brand-600 transition">${job.title}</h3>
+                        <p class="text-sm font-medium text-slate-500">${job.company}</p>
+                    </div>
+                    
+                    <div class="space-y-2 mb-6">
+                        <div class="flex items-center text-sm text-slate-600 bg-slate-50 py-1.5 px-3 rounded-lg w-fit">
+                            <i class="ph-fill ph-map-pin text-brand-500 mr-2"></i> ${job.location}
+                        </div>
+                        <div class="flex items-center text-sm text-slate-600 bg-slate-50 py-1.5 px-3 rounded-lg w-fit">
+                            <i class="ph-fill ph-briefcase text-brand-500 mr-2"></i> ${job.type}
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4 border-t border-slate-100 mt-auto flex justify-between items-center">
+                        <div class="flex items-center text-xs text-slate-500 font-medium">
+                            <div class="flex -space-x-2 mr-2">
+                                <img class="w-6 h-6 rounded-full border-2 border-white object-cover" src="https://i.pravatar.cc/100?img=${job.id}" alt="avatar">
+                                <img class="w-6 h-6 rounded-full border-2 border-white object-cover" src="https://i.pravatar.cc/100?img=${job.id+10}" alt="avatar">
+                            </div>
+                            ${job.applicants} Pelamar
+                        </div>
+                        <span class="text-brand-600 font-bold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">Detail <i class="ph-bold ph-arrow-right"></i></span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleFavorite(event, jobId) {
+            event.stopPropagation();
+            const index = userFavorites.indexOf(jobId);
+            
+            if (index > -1) {
+                userFavorites.splice(index, 1);
+                showToast('Dihapus dari favorit', 'info');
+            } else {
+                userFavorites.push(jobId);
+                showToast('Disimpan ke favorit', 'success');
+            }
+            
+            setStorage('karierkita_favorites_v10', userFavorites);
+            
+            const icon = document.getElementById(`fav-icon-${jobId}`);
+            if (icon) {
+                if (index > -1) {
+                    icon.className = 'ph ph-heart text-slate-400 text-xl';
+                } else {
+                    icon.className = 'ph-fill ph-heart text-red-500 text-xl';
+                }
+            }
+
+            if (currentView === 'job-detail' && currentJobId === jobId) {
+                updateDetailSaveIcon();
+            }
+
+            if (currentView === 'applications') {
+                renderFavorites();
+            }
+        }
+
+        /* ---------------------------------------------------------
+           5. HOME & EXPLORE LOGIC
+           --------------------------------------------------------- */
+        function initHome() {
+            const container = document.getElementById('featured-jobs-container');
+            container.innerHTML = jobs.slice(0, 4).map(job => createJobCard(job)).join('');
+        }
+
+        function handleHeroSearch(e) {
+            e.preventDefault();
+            searchQuery = document.getElementById('hero-search-input').value;
+            document.getElementById('explore-search-input').value = searchQuery;
+            navigate('explore');
+        }
+
+        function renderCategoryFilters() {
+            const container = document.getElementById('category-filters');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat}')" 
+                        class="px-4 py-2 rounded-full text-sm font-medium transition ${activeCategory === cat ? 'bg-brand-600 text-white' : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-50'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function setCategory(cat) {
+            activeCategory = cat;
+            renderCategoryFilters();
+            filterJobs();
+        }
+
+        function filterJobs() {
+            const searchInput = document.getElementById('explore-search-input').value.toLowerCase();
+            const container = document.getElementById('explore-jobs-container');
+            const noJobsMsg = document.getElementById('no-jobs-message');
+            
+            const filtered = jobs.filter(job => {
+                const matchSearch = job.title.toLowerCase().includes(searchInput) || job.company.toLowerCase().includes(searchInput);
+                const matchCategory = activeCategory === 'Semua' || job.category === activeCategory;
+                return matchSearch && matchCategory;
+            });
+
+            document.getElementById('job-count').textContent = filtered.length;
+
+            if (filtered.length > 0) {
+                container.innerHTML = filtered.map(job => createJobCard(job)).join('');
+                container.classList.remove('hidden');
+                noJobsMsg.classList.add('hidden');
+            } else {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                noJobsMsg.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('explore-search-input').addEventListener('input', () => filterJobs());
+
+        /* ---------------------------------------------------------
+           6. JOB DETAIL LOGIC
+           --------------------------------------------------------- */
+        function loadJobDetail(id) {
+            currentJobId = id;
+            const job = jobs.find(j => j.id === id);
+            if (!job) return navigate('explore');
+
+            document.getElementById('detail-title').textContent = job.title;
+            document.getElementById('detail-company').textContent = job.company;
+            document.getElementById('detail-location').innerHTML = `<i class="ph-fill ph-map-pin text-brand-500 mr-1"></i> ${job.location}`;
+            document.getElementById('detail-category').textContent = job.category;
+            document.getElementById('detail-type').textContent = job.type;
+            document.getElementById('detail-salary').textContent = job.salary;
+            document.getElementById('detail-description').textContent = job.description;
+            document.getElementById('detail-applicants').textContent = job.applicants;
+            
+            const reqContainer = document.getElementById('detail-requirements');
+            reqContainer.innerHTML = job.requirements.map(req => `<li>${req}</li>`).join('');
+
+            updateDetailSaveIcon();
+        }
+
+        function updateDetailSaveIcon() {
+            const isFav = userFavorites.includes(currentJobId);
+            const icon = document.getElementById('detail-save-icon');
+            if (isFav) {
+                icon.className = 'ph-fill ph-heart text-xl text-red-500';
+            } else {
+                icon.className = 'ph ph-heart text-xl';
+            }
+        }
+
+        function toggleSaveDetailJob() {
+            const fakeEvent = { stopPropagation: () => {} };
+            toggleFavorite(fakeEvent, currentJobId);
+        }
+
+        /* ---------------------------------------------------------
+           7. APPLY FORM LOGIC (MODAL)
+           --------------------------------------------------------- */
+        function openApplyModal() {
+            const job = jobs.find(j => j.id === currentJobId);
+            
+            const hasApplied = userApplications.some(app => app.jobId === currentJobId);
+            if (hasApplied) {
+                showToast('Anda sudah melamar posisi ini sebelumnya.', 'info');
+                return;
+            }
+
+            document.getElementById('modal-job-title').textContent = job.title;
+            document.getElementById('modal-job-company').textContent = job.company;
+            
+            document.getElementById('apply-name').value = userProfile.name;
+            document.getElementById('apply-email').value = userProfile.email;
+            document.getElementById('apply-cv').value = '';
+
+            const modal = document.getElementById('apply-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeApplyModal() {
+            const modal = document.getElementById('apply-modal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        document.getElementById('apply-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('apply-name').value;
+            const email = document.getElementById('apply-email').value;
+            const cvLink = document.getElementById('apply-cv').value;
+
+            if (!name || !email || !cvLink) {
+                showToast('Mohon lengkapi semua field', 'info');
+                return;
+            }
+
+            const application = {
+                id: Date.now(),
+                jobId: currentJobId,
+                name: name,
+                email: email,
+                cvLink: cvLink,
+                status: 'Terkirim',
+                date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+            };
+
+            userApplications.push(application);
+            setStorage('karierkita_applications_v10', userApplications);
+
+            closeApplyModal();
+            showToast('Lamaran berhasil dikirim!', 'success');
+            
+            setTimeout(() => navigate('applications'), 1500);
+        });
+
+        /* ---------------------------------------------------------
+           8. DASHBOARD LOGIC (APPLICATIONS & SAVED)
+           --------------------------------------------------------- */
+        function switchDashboardTab(tab) {
+            document.getElementById('tab-applied').className = tab === 'applied' 
+                ? 'flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-medium transition bg-brand-50 text-brand-700' 
+                : 'flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-medium transition text-slate-600 hover:bg-slate-50';
+            
+            document.getElementById('tab-saved').className = tab === 'saved'
+                ? 'flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-medium transition bg-brand-50 text-brand-700'
+                : 'flex-1 md:flex-none px-6 py-2 rounded-md text-sm font-medium transition text-slate-600 hover:bg-slate-50';
+
+            document.getElementById('tab-content-applied').style.display = tab === 'applied' ? 'block' : 'none';
+            document.getElementById('tab-content-saved').style.display = tab === 'saved' ? 'block' : 'none';
+        }
+
+        function renderApplications() {
+            const container = document.getElementById('applications-container');
+            const noDataMsg = document.getElementById('no-applications-message');
+            
+            if (userApplications.length === 0) {
+                container.innerHTML = '';
+                noDataMsg.classList.remove('hidden');
+                return;
+            }
+
+            noDataMsg.classList.add('hidden');
+            
+            const sortedApps = [...userApplications].reverse();
+
+            container.innerHTML = sortedApps.map(app => {
+                const job = jobs.find(j => j.id === app.jobId);
+                if (!job) return '';
+
+                let statusColor = 'bg-blue-100 text-blue-700';
+                if (app.status === 'Ditinjau') statusColor = 'bg-yellow-100 text-yellow-700';
+                if (app.status === 'Wawancara') statusColor = 'bg-green-100 text-green-700';
+
+                return `
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-brand-300 transition cursor-pointer" onclick="navigate('job-detail', {id: ${job.id}})">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 hidden sm:flex">
+                                <i class="ph ph-buildings text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg text-slate-800">${job.title}</h4>
+                                <p class="text-slate-600 font-medium">${job.company}</p>
+                                <p class="text-xs text-slate-500 mt-1">Dilamar pada: ${app.date}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto mt-4 md:mt-0 gap-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">
+                                ${app.status}
+                            </span>
+                            <span class="text-brand-600 text-sm font-medium hover:underline">Lihat Lowongan</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFavorites() {
+            const container = document.getElementById('saved-jobs-container');
+            const noDataMsg = document.getElementById('no-saved-message');
+            
+            const savedJobs = jobs.filter(job => userFavorites.includes(job.id));
+
+            if (savedJobs.length === 0) {
+                container.innerHTML = '';
+                noDataMsg.classList.remove('hidden');
+                return;
+            }
+
+            noDataMsg.classList.add('hidden');
+            container.innerHTML = savedJobs.map(job => createJobCard(job)).join('');
+        }
+
+        /* ---------------------------------------------------------
+           9. PROFILE LOGIC
+           --------------------------------------------------------- */
+        let isEditingProfile = false;
+
+        function loadProfile() {
+            updateUserInfoUI();
+            
+            document.getElementById('prof-name').value = userProfile.name;
+            document.getElementById('prof-email').value = userProfile.email;
+            document.getElementById('prof-uni').value = userProfile.university;
+            document.getElementById('prof-major').value = userProfile.major;
+            document.getElementById('prof-bio').value = userProfile.bio;
+
+            isEditingProfile = false;
+            updateProfileFormState();
+        }
+
+        function toggleEditProfile() {
+            isEditingProfile = !isEditingProfile;
+            updateProfileFormState();
+            if(!isEditingProfile) {
+                loadProfile(); 
+            }
+        }
+
+        function updateProfileFormState() {
+            const inputs = ['prof-name', 'prof-email', 'prof-uni', 'prof-major', 'prof-bio'];
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                el.disabled = !isEditingProfile;
+                if(isEditingProfile) {
+                    el.classList.add('bg-white');
+                    el.classList.remove('bg-slate-50');
+                } else {
+                    el.classList.add('bg-slate-50');
+                    el.classList.remove('bg-white');
+                }
+            });
+
+            const actions = document.getElementById('profile-actions');
+            if (isEditingProfile) {
+                actions.classList.remove('hidden');
+            } else {
+                actions.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            userProfile = {
+                ...userProfile,
+                name: document.getElementById('prof-name').value,
+                email: document.getElementById('prof-email').value,
+                university: document.getElementById('prof-uni').value,
+                major: document.getElementById('prof-major').value,
+                bio: document.getElementById('prof-bio').value,
+                avatar: 'profile.jpg'
+            };
+
+            setStorage('karierkita_profile_v10', userProfile);
+            showToast('Profil berhasil diperbarui!', 'success');
+            
+            isEditingProfile = false;
+            updateProfileFormState();
+            
+            updateUserInfoUI();
+        });
+
+        /* ---------------------------------------------------------
+           10. INITIALIZATION
+           --------------------------------------------------------- */
+        window.onload = () => {
+            initHome();
+            updateUserInfoUI();
+            navigate('home');
+        };
+
+    </script>
+</body>
+</html>
